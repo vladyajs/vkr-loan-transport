@@ -1,0 +1,27 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:15433/vkr_loan_transport_db
+    username: vkr_user
+    password: vkr_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+camunda:
+  bpm:
+    admin-user:
+      id: admin
+      password: admin
+      group: admin
+
+
