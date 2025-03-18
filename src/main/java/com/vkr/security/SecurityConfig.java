@@ -19,11 +19,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Добавляем фильтр перед UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .requestMatchers("/auth/register", "/auth/login").permitAll() // Разрешаем доступ к этим эндпоинтам без авторизации
-                .anyRequest().authenticated(); // Остальные запросы требуют аутентификации
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/applicants/**").hasRole("USER") // Требуем роль USER
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Добавляем JwtFilter
         return http.build();
     }
 }

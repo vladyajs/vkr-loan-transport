@@ -1,6 +1,9 @@
 package com.vkr.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -11,49 +14,53 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtFilter extends GenericFilterBean {
-    private final String SECRET_KEY = "vkr"; // ДОЛЖЕН БЫТЬ В .env ИЛИ СЕКРЕТАХ!
+    private final SecretKey SECRET_KEY; // Используйте SecretKey вместо Key
+
+    public JwtFilter() {
+        // Генерация ключа (32 символа = 256 бит)
+        String secretString = "vkr_super_secret_key_1234567890_ABC_adadadadadadededededfdjjf";
+        this.SECRET_KEY = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+    }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+            throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         String authHeader = httpRequest.getHeader("Authorization");
 
-        // Проверяем, есть ли заголовок "Authorization" и начинается ли он с "Bearer "
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Извлекаем сам токен
+            String token = authHeader.substring(7);
 
             try {
-                // Используем parserBuilder() вместо parser()
-                JwtParser jwtParser = Jwts.parser()
-                        .setSigningKey(SECRET_KEY)  // Устанавливаем секретный ключ для подписи
-                        .build(); // Строим экземпляр JwtParser
+                JwtParser parser = Jwts.parser()
+                        .verifyWith(SECRET_KEY)
+                        .build();
 
-                // Парсим токен
-                Claims claims = jwtParser.parseClaimsJws(token).getBody();
+                Claims claims = parser.parseSignedClaims(token).getPayload();
+                String username = claims.getSubject();
+                String role = claims.get("role", String.class);
 
-                String username = claims.getSubject(); // Получаем имя пользователя из токена
-                String role = claims.get("role", String.class); // Получаем роль пользователя (если она есть в токене)
-
-                // Создаем объект аутентификации и устанавливаем его в контекст безопасности
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, null, Collections.emptyList()); // Поскольку пароль не передается, указываем null
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails((jakarta.servlet.http.HttpServletRequest) httpRequest));
-
-                // Устанавливаем аутентификацию в SecurityContext
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        username, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
             } catch (JwtException | IllegalArgumentException e) {
-                // Если токен некорректный, очищаем контекст безопасности
+                logger.error("JWT error: {}", e.getCause()); // Добавьте вывод сообщения об ошибке
                 SecurityContextHolder.clearContext();
             }
         }
 
-        // Продолжаем выполнение цепочки фильтров
         filterChain.doFilter(servletRequest, servletResponse);
     }
 }

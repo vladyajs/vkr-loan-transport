@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd
+    http://camunda.org/schema/1.0/bpmn http://camunda.org/schema/1.0/bpmn"
+  id="Definitions_1"
+  targetNamespace="http://bpmn.io/schema/bpmn"
+  exporter="Camunda Modeler"
+  exporterVersion="5.9.0">
+
+  <bpmn:process id="loanApplicationProcess" name="Loan Application Process" isExecutable="true">
+    <!-- Start Event -->
+    <bpmn:startEvent id="startEvent" name="Start Application">
+      <bpmn:outgoing>flow1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Tasks -->
+    <bpmn:task id="scoringTask" name="Loan Scoring">
+      <bpmn:extensionElements>
+        <camunda:assignee>scoringService</camunda:assignee>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow1</bpmn:incoming>
+      <bpmn:outgoing>flow2</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="riskAssessmentTask" name="Risk Assessment">
+      <bpmn:extensionElements>
+        <camunda:assignee>riskService</camunda:assignee>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow2</bpmn:incoming>
+      <bpmn:outgoing>flow3</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="notificationTask" name="Send Notification">
+      <bpmn:extensionElements>
+        <camunda:assignee>notificationService</camunda:assignee>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow3</bpmn:incoming>
+      <bpmn:outgoing>flow4</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- Gateway -->
+    <bpmn:exclusiveGateway id="decisionGateway" name="Is Loan Approved?">
+      <bpmn:incoming>flow4</bpmn:incoming>
+      <bpmn:outgoing>flow5</bpmn:outgoing>
+      <bpmn:outgoing>flow6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Approval Path -->
+    <bpmn:task id="approveTask" name="Loan Approved">
+      <bpmn:extensionElements>
+        <camunda:assignee>loanApprovalService</camunda:assignee>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow5</bpmn:incoming>
+      <bpmn:outgoing>flow7</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="endEventApproved" name="Loan Approved">
+      <bpmn:incoming>flow7</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Rejection Path -->
+    <bpmn:task id="rejectTask" name="Loan Rejected">
+      <bpmn:extensionElements>
+        <camunda:assignee>loanRejectionService</camunda:assignee>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow6</bpmn:incoming>
+      <bpmn:outgoing>flow8</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="endEventRejected" name="Loan Rejected">
+      <bpmn:incoming>flow8</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Flows -->
+    <bpmn:sequenceFlow id="flow1" sourceRef="startEvent" targetRef="scoringTask"/>
+    <bpmn:sequenceFlow id="flow2" sourceRef="scoringTask" targetRef="riskAssessmentTask"/>
+    <bpmn:sequenceFlow id="flow3" sourceRef="riskAssessmentTask" targetRef="notificationTask"/>
+    <bpmn:sequenceFlow id="flow4" sourceRef="notificationTask" targetRef="decisionGateway"/>
+    <bpmn:sequenceFlow id="flow5" sourceRef="decisionGateway" targetRef="approveTask"/>
+    <bpmn:sequenceFlow id="flow6" sourceRef="decisionGateway" targetRef="rejectTask"/>
+    <bpmn:sequenceFlow id="flow7" sourceRef="approveTask" targetRef="endEventApproved"/>
+    <bpmn:sequenceFlow id="flow8" sourceRef="rejectTask" targetRef="endEventRejected"/>
+  </bpmn:process>
+
+  <!-- Visual Layout -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="loanApplicationProcess">
+
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="StartEvent_1di" bpmnElement="startEvent">
+        <dc:Bounds x="152" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Tasks -->
+      <bpmndi:BPMNShape id="ScoringTask_di" bpmnElement="scoringTask">
+        <dc:Bounds x="280" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="RiskTask_di" bpmnElement="riskAssessmentTask">
+        <dc:Bounds x="440" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="NotificationTask_di" bpmnElement="notificationTask">
+        <dc:Bounds x="600" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway -->
+      <bpmndi:BPMNShape id="Gateway_di" bpmnElement="decisionGateway">
+        <dc:Bounds x="760" y="105" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Approval Path -->
+      <bpmndi:BPMNShape id="ApproveTask_di" bpmnElement="approveTask">
+        <dc:Bounds x="860" y="30" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndApproved_di" bpmnElement="endEventApproved">
+        <dc:Bounds x="1020" y="62" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Rejection Path -->
+      <bpmndi:BPMNShape id="RejectTask_di" bpmnElement="rejectTask">
+        <dc:Bounds x="860" y="160" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndRejected_di" bpmnElement="endEventRejected">
+        <dc:Bounds x="1020" y="182" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Connectors -->
+      <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+        <di:waypoint x="188" y="120"/>
+        <di:waypoint x="280" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+        <di:waypoint x="380" y="120"/>
+        <di:waypoint x="440" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+        <di:waypoint x="540" y="120"/>
+        <di:waypoint x="600" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+        <di:waypoint x="700" y="120"/>
+        <di:waypoint x="760" y="130"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="flow5_di" bpmnElement="flow5">
+        <di:waypoint x="785" y="105"/>
+        <di:waypoint x="860" y="70"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="flow6_di" bpmnElement="flow6">
+        <di:waypoint x="785" y="155"/>
+        <di:waypoint x="860" y="200"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="flow7_di" bpmnElement="flow7">
+        <di:waypoint x="960" y="70"/>
+        <di:waypoint x="1020" y="80"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="flow8_di" bpmnElement="flow8">
+        <di:waypoint x="960" y="200"/>
+        <di:waypoint x="1020" y="200"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
