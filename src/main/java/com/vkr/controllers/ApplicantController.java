@@ -31,17 +31,21 @@ public class ApplicantController {
     // Получение заявителя по email
     @GetMapping("/email/{email}")
     public ResponseEntity<Applicant> getApplicantByEmail(@PathVariable String email) {
-        return applicantService.findApplicantByEmail(email)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            return ResponseEntity.ok(applicantService.findApplicantByEmail(email));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // Получение заявителя по ИНН
     @GetMapping("/inn/{inn}")
     public ResponseEntity<Applicant> getApplicantByInn(@PathVariable String inn) {
-        return applicantService.findApplicantByInn(inn)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            return ResponseEntity.ok(applicantService.findApplicantByInn(inn));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // Обновление данных заявителя

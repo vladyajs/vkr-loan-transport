@@ -2,16 +2,23 @@ package com.vkr.clients;
 
 import com.vkr.models.LoanApplication;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
 public class RiskServiceClient {
 
-    // Пример метода для отправки заявки в RiskService
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${services.risk-service}")
+    private String riskServiceUrl;
+
     public void sendForRiskAssessment(LoanApplication loanApplication) {
-        // Логика отправки заявки в RiskService для оценки рисков
-        log.info("Отправка заявки в RiskService для оценки рисков: " + loanApplication.getLoanApplicationId());
+        String url = riskServiceUrl + "/risk";
+        restTemplate.postForObject(url, loanApplication, Void.class);
+        log.info("Отправка заявки в RiskService: {}", loanApplication.getLoanApplicationId());
     }
 }
 

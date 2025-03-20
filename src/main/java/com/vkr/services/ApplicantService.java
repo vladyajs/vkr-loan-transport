@@ -25,15 +25,16 @@ public class ApplicantService {
         return applicantRepository.findById(applicantId);
     }
 
-    // Поиск заявителя по email
-    public Optional<Applicant> findApplicantByEmail(String email) {
-        return Optional.ofNullable(applicantRepository.findByEmail(email));
+    public Applicant findApplicantByEmail(String email) {
+        return applicantRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Заявитель не найден"));
     }
 
-    // Поиск заявителя по ИНН
-    public Optional<Applicant> findApplicantByInn(String inn) {
-        return Optional.ofNullable(applicantRepository.findByInn(inn));
+    public Applicant findApplicantByInn(String inn) {
+        return applicantRepository.findByInn(inn)
+                .orElseThrow(() -> new RuntimeException("Заявитель не найден"));
     }
+
 
     // Обновление данных заявителя
     public Applicant updateApplicant(Long applicantId, Applicant updatedApplicant) {

@@ -23,5 +23,9 @@ camunda:
       id: admin
       password: admin
       group: admin
+services:
+  scoring-service: http://vkr-corp-scoring-service
+  risk-service: ddd
+  notification-service: ddddd
 
 

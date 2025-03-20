@@ -27,15 +27,5 @@ public class Notification {
     private String message;
     private LocalDateTime sentAt;
     private String notificationType;
-
-    // Конструкторы, геттеры и сеттеры
-
-    public void sendNotification() {
-        // Логика отправки уведомлений
-    }
-
-    public void getNotificationStatus() {
-        // Логика получения статуса уведомления
-    }
 }
 

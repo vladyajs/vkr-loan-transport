@@ -28,14 +28,5 @@ public class RiskAssessmentResult {
     private LocalDateTime assessmentDate;
     private String assessmentStatus;
 
-    // Конструкторы, геттеры и сеттеры
-
-    public void evaluateRisk() {
-        // Логика оценки рисков
-    }
-
-    public void getRiskAssessment() {
-        // Логика получения результатов оценки рисков
-    }
 }
 

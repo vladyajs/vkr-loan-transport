@@ -28,13 +28,4 @@ public class AuditLog {
     private LocalDateTime actionTimestamp;
     private Long userId;
 
-    // Конструкторы, геттеры и сеттеры
-
-    public void logAction() {
-        // Логика записи действия в лог
-    }
-
-    public void getAuditLogs() {
-        // Логика получения записей лога
-    }
 }

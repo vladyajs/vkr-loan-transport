@@ -4,33 +4,36 @@ import com.vkr.models.AuditLog;
 import com.vkr.models.LoanApplication;
 import com.vkr.repositories.AuditLogRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Slf4j
 public class AuditLogService {
 
-    @Autowired
-    private AuditLogRepository auditLogRepository;
+    private final AuditLogRepository auditLogRepository;
 
-    // Логируем действия в системе
+    public AuditLogService(AuditLogRepository auditLogRepository) {
+        this.auditLogRepository = auditLogRepository;
+    }
+
     @Transactional
     public void logAction(String action, LoanApplication loanApplication) {
         AuditLog auditLog = new AuditLog();
         auditLog.setLoanApplication(loanApplication);
         auditLog.setAction(action);
         auditLog.setActionTimestamp(LocalDateTime.now());
-        auditLog.setUserId(loanApplication.getApplicant().getApplicantId());  // Для примера, предполагаем, что заявка имеет связь с пользователем
+        auditLog.setUserId(loanApplication.getApplicant().getApplicantId());
 
-        // Сохраняем лог в базе данных
         auditLogRepository.save(auditLog);
 
-        // Логируем в консоль для отладки
         log.info("Action logged: {} for LoanApplication ID: {}", action, loanApplication.getLoanApplicationId());
     }
-}
 
+    public List<AuditLog> getAuditLogsByApplicationId(Long applicationId) {
+        return auditLogRepository.findByLoanApplicationLoanApplicationId(applicationId);
+    }
+}

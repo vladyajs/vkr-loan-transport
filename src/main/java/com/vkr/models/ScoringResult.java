@@ -28,14 +28,5 @@ public class ScoringResult {
     private LocalDateTime scoringDate;
     private String scoringStatus;
 
-    // Конструкторы, геттеры и сеттеры
-
-    public void calculateScore() {
-        // Логика вычисления кредитного балла
-    }
-
-    public void getScoringResult() {
-        // Логика получения результатов скоринга
-    }
 }
 
