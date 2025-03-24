@@ -5,6 +5,7 @@ import com.vkr.repositories.ApplicantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,6 +34,10 @@ public class ApplicantService {
     public Applicant findApplicantByInn(String inn) {
         return applicantRepository.findByInn(inn)
                 .orElseThrow(() -> new RuntimeException("Заявитель не найден"));
+    }
+
+    public List<Applicant> findAllApplicants() {
+        return applicantRepository.findAll();
     }
 
 

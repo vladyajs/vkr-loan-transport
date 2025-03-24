@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/applicants")
 public class ApplicantController {
@@ -26,6 +28,11 @@ public class ApplicantController {
         return applicantService.findApplicantById(applicantId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Applicant>> getAllApplicants() {
+        return ResponseEntity.ok(applicantService.findAllApplicants());
     }
 
     // Получение заявителя по email
@@ -53,4 +60,7 @@ public class ApplicantController {
     public ResponseEntity<Applicant> updateApplicant(@PathVariable Long applicantId, @RequestBody Applicant updatedApplicant) {
         return ResponseEntity.ok(applicantService.updateApplicant(applicantId, updatedApplicant));
     }
+
+
+
 }
